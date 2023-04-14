@@ -68,7 +68,7 @@ if (clientID && clientSecret) {
             {
                 host: process.env.LAVALINK_HOST || "lava.link",
                 port: parseInt(process.env.LAVALINK_PORT) || 80,
-                password: process.env.LAVALINK_PASSWORD || "CorwinDev"
+                password: process.env.LAVALINK_PASSWORD || "gaetanjeff"
             },
         ],
         send(id, payload) {
@@ -89,7 +89,7 @@ if (clientID && clientSecret) {
             {
                 host: process.env.LAVALINK_HOST || "lava.link",
                 port: parseInt(process.env.LAVALINK_PORT) || 80,
-                password: process.env.LAVALINK_PASSWORD || "CorwinDev"
+                password: process.env.LAVALINK_PASSWORD || "gaetanjeff"
             },
         ],
         send(id, payload) {
