@@ -66,9 +66,9 @@ if (clientID && clientSecret) {
         ],
         nodes: [
             {
-                host: process.env.LAVALINK_HOST || "lava.link",
-                port: parseInt(process.env.LAVALINK_PORT) || 80,
-                password: process.env.LAVALINK_PASSWORD || "gaetanjeff"
+                host: process.env.LAVALINK_HOST || "localhost",
+                port: parseInt(process.env.LAVALINK_PORT) || 8080,
+                password: process.env.LAVALINK_PASSWORD || "gaetanlebg"
             },
         ],
         send(id, payload) {
@@ -87,9 +87,9 @@ if (clientID && clientSecret) {
         ],
         nodes: [
             {
-                host: process.env.LAVALINK_HOST || "lava.link",
-                port: parseInt(process.env.LAVALINK_PORT) || 80,
-                password: process.env.LAVALINK_PASSWORD || "gaetanjeff"
+                host: "localhost",
+                port: 8080,
+                password: "gaetanlebg"
             },
         ],
         send(id, payload) {
