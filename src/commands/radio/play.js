@@ -40,7 +40,7 @@ module.exports = async (client, interaction, args) => {
         },
         {
             name: "🎶┆Radio Station",
-            value: `[Radio 538](https://www.538.nl/)`,
+            value: `[NRJ](http://cdn.nrjaudio.fm/audio1/fr/40128/aac_64.mp3)`,
             inline: true
         },
         ],

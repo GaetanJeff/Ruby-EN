@@ -191,6 +191,11 @@ module.exports = {
                         .setDescription('Play the roblox sound'),
                 )
                 .addSubcommand((subcommand) =>
+                subcommand
+                    .setName('rounaldo')
+                    .setDescription('Play the rounaldo sound'),
+            )
+                .addSubcommand((subcommand) =>
                     subcommand
                         .setName('shotdown')
                         .setDescription('Play the shotdown sound'),

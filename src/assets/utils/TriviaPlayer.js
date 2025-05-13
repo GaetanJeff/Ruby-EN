@@ -25,7 +25,7 @@ class TriviaPlayer {
 
     passConnection(connection) {
         this.connection = connection;
-        this.connection.on('stateChange', async (_, newState) => {
+        this.connection.on('stateChange', async (oldState, newState) => {
             if (newState.status === VoiceConnectionStatus.Disconnected) {
                 if (
                     newState.reason === VoiceConnectionDisconnectReason.WebSocketClose &&
@@ -47,7 +47,6 @@ class TriviaPlayer {
                     this.connection.destroy();
                 }
             } else if (newState.status === VoiceConnectionStatus.Destroyed) {
-                // when destroying connection (stop-trivia)
                 this.stop();
             } else if (
                 newState.status === VoiceConnectionStatus.Connecting ||
@@ -59,9 +58,22 @@ class TriviaPlayer {
                         VoiceConnectionStatus.Ready,
                         20000
                     );
-                } catch {
-                    if (this.connection.state.status !== VoiceConnectionStatus.Destroyed)
+                } catch (error) {
+                    console.error('Failed to enter Ready state:', error);
+                    if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
                         this.connection.destroy();
+                    }
+                }
+            } else if (newState.status === VoiceConnectionStatus.Ready) {
+                // Handle ready state explicitly
+                try {
+                    // Ensure we're actually connected
+                    if (!this.connection.joinConfig) {
+                        throw new Error('No join config present');
+                    }
+                } catch (error) {
+                    console.error('Error in Ready state:', error);
+                    this.connection.destroy();
                 }
             }
         });
