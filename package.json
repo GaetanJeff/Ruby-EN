@@ -58,7 +58,7 @@
     "lavacord": "^2.2.0",
     "libsodium-wrappers": "^0.7.10",
     "lyrics-finder": "^21.7.0",
-    "mathjs": "^14.8.2",
+    "mathjs": "^15.0.0",
     "moment": "^2.29.4",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.39",
