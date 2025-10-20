@@ -3,7 +3,8 @@ const Schema = require("../../database/models/customCommandAdvanced");
 
 module.exports = async (client, interaction, args) => {
     const cmdname = interaction.options.getString('command');
-    Schema.findOne({ Guild: interaction.guild.id, Name: cmdname.toLowerCase() }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Name: cmdname.toLowerCase() });
         console.log(data)
         if (data) {
             Schema.findOneAndDelete({ Guild: interaction.guild.id, Name: cmdname.toLowerCase() }).then(async () => {
@@ -26,8 +27,9 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: "Unable to find this command!", type: 'editreply' }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
+    }
 }
 
  

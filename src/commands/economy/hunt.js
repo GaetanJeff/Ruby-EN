@@ -34,7 +34,8 @@ module.exports = async (client, interaction, args) => {
 
     let huntToWin = hunt[randn];
 
-    Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
+    try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
         if (dataTime && dataTime.Hunt !== null && timeout - (Date.now() - dataTime.Hunt) > 0) {
             let time = (dataTime.Hunt / 1000 + timeout / 1000).toFixed(0);
 
@@ -55,8 +56,9 @@ module.exports = async (client, interaction, args) => {
                 }).save();
             }
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans hunt.js:', err);
+    }
 }
 
  

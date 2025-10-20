@@ -35,8 +35,9 @@ module.exports = async (client, interaction, args) => {
     }
 
     if (message.toUpperCase() == "DEFAULT") {
-        inviteMessages.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await inviteMessages.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.inviteJoin = null;
                 data.save();
 
@@ -45,11 +46,14 @@ module.exports = async (client, interaction, args) => {
                     type: 'editreply'
                 }, interaction);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans welcomemessage.js:', err);
+    }
     }
     else {
-        inviteMessages.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await inviteMessages.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.inviteJoin = message;
                 data.save();
             }
@@ -71,7 +75,9 @@ module.exports = async (client, interaction, args) => {
                 ],
                 type: 'editreply'
             }, interaction)
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans welcomemessage.js:', err);
+    }
     }
 }
 

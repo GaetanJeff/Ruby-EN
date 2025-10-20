@@ -8,7 +8,8 @@ module.exports = async (client, interaction, args) => {
     let timeout = 180000;
     let amount = 5;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
+    try {
+        const dataTime = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (dataTime && dataTime.Beg !== null && timeout - (Date.now() - dataTime.Beg) > 0) {
             let time = (dataTime.Beg / 1000 + timeout / 1000).toFixed(0);
             return client.errWait({
@@ -44,7 +45,9 @@ module.exports = async (client, interaction, args) => {
 
             client.addMoney(interaction, user, amount);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans beg.js:', err);
+    }
 }
 
  

@@ -31,8 +31,9 @@ module.exports = {
 
         const member = interaction.guild.members.cache.get(interaction.targetId);
 
-        Schema.findOne({ Guild: interaction.guild.id, User: member.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: member.id });
+        if (data) {
                 var fields = [];
                 data.Warnings.forEach(element => {
                     fields.push({
@@ -61,7 +62,9 @@ module.exports = {
                     type: 'editreply'
                 }, interaction)
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans warnings.js:', err);
+    }
     },
 };
 

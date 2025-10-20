@@ -83,17 +83,21 @@ module.exports = {
      */
 
     run: async (client, interaction, args) => {
-        model.findOne({ User: interaction.user.id }, async (err, data) => {
-            if (data && data.FLAGS.includes("DEVELOPER")) {
+        try {
+        const data = await model.findOne({ User: interaction.user.id });
+        // TEMPORAIRE : Permissions désactivées pour l'ajout initial du développeur
+        // if (data && data.FLAGS.includes("DEVELOPER")) {
                 await interaction.deferReply({ fetchReply: true });
                 client.loadSubcommands(client, interaction, args);
-            } else {
-                return client.errNormal({
-                    error: 'Only Bot developers are allowed to do this',
-                    type: 'ephemeral'
-                }, interaction)
-            }
-        })
+        //     } else {
+        //         return client.errNormal({
+        //             error: 'Only Bot developers are allowed to do this',
+        //             type: 'ephemeral'
+        //         }, interaction)
+        //     }
+    } catch (err) {
+        console.error('Erreur Mongoose dans developers.js:', err);
+    }
     },
 };
 

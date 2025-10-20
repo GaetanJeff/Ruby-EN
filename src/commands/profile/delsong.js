@@ -5,7 +5,8 @@ module.exports = async (client, interaction, args) => {
     const song = interaction.options.getString('song');
     const user = { User: interaction.user.id }
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
 
             if (data && data.Songs) {
@@ -32,8 +33,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with createprofile", type:'editreply' }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans delsong.js:', err);
+    }
 }
 
  

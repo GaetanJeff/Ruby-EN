@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Captcha = require("@haileybot/captcha-generator");
+// const Captcha = require("@haileybot/captcha-generator");
 
 const reactionSchema = require("../../database/models/reactionRoles");
 const banSchema = require("../../database/models/userBans");
@@ -9,8 +9,9 @@ const CommandsSchema = require("../../database/models/customCommandAdvanced");
 module.exports = async (client, interaction) => {
     // Commands
     if (interaction.isCommand() || interaction.isUserContextMenuCommand()) {
-        banSchema.findOne({ User: interaction.user.id }, async (err, data) => {
-            if (data) {
+        try {
+            const data = await banSchema.findOne({ User: interaction.user.id });
+        if (data) {
                 return client.errNormal({
                     error: "You have been banned by the developers of this bot",
                     type: 'ephemeral'
@@ -72,7 +73,9 @@ module.exports = async (client, interaction) => {
                     client.emit("errorCreate", err, interaction.commandName, interaction)
                 })
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans interactionCreate.js:', err);
+    }
     }
 
     // Verify system
@@ -132,8 +135,9 @@ module.exports = async (client, interaction) => {
         var buttonID = interaction.customId.split("-");
 
         if (buttonID[0] == "reaction_button") {
-            reactionSchema.findOne({ Message: interaction.message.id }, async (err, data) => {
-                if (!data) return;
+            try {
+            const data = await reactionSchema.findOne({ Message: interaction.message.id });
+        if (!data) return;
 
                 const [roleid] = data.Roles[buttonID[1]];
 
@@ -147,17 +151,18 @@ module.exports = async (client, interaction) => {
 
                     interaction.reply({ content: `<@&${roleid}> was added!`, ephemeral: true });
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans interactionCreate.js:', err);
+    }
         }
     }
 
     // Reaction roles select
     if (interaction.isStringSelectMenu()) {
         if (interaction.customId == "reaction_select") {
-            reactionSchema.findOne(
-                { Message: interaction.message.id },
-                async (err, data) => {
-                    if (!data) return;
+            try {
+            const data = await reactionSchema.findOne({ Message: interaction.message.id });
+        if (!data) return;
 
                     let roles = "";
 
@@ -185,8 +190,9 @@ module.exports = async (client, interaction) => {
                             });
                         }
                     }
-                }
-            );
+    } catch (err) {
+        console.error('Erreur Mongoose dans interactionCreate.js:', err);
+    }
         }
     }
     // Tickets

@@ -10,13 +10,15 @@ module.exports = async (client, interaction, args) => {
 
     if (target.id === interaction.user.id) return client.errNormal({ error: `You cannot thank yourself!`, type: 'editreply' }, interaction);
 
-    thanksAuthor.findOne({ User: target.id, Author: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await thanksAuthor.findOne({ User: target.id, Author: interaction.user.id });
         if (data) {
             client.errNormal({ error: `You already thanked this user!`, type: 'editreply' }, interaction);
         }
         else {
-            thanksSchema.findOne({ User: target.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await thanksSchema.findOne({ User: target.id });
+        if (data) {
                     data.Received += 1;
                     data.save();
                     client.succNormal({ text: `You have thanked <@${target.id}>! They now have \`${data.Received}\` thanks`, type: 'editreply' }, interaction);
@@ -29,14 +31,17 @@ module.exports = async (client, interaction, args) => {
                     }).save();
                     client.succNormal({ text: `You have thanked <@${target.id}>! They now have \`1\` thanks`, type: 'editreply' }, interaction);
                 }
-            })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans thanks.js:', err);
+    }
             new thanksAuthor({
                 User: target.id,
                 Author: interaction.user.id,
             }).save();
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans thanks.js:', err);
+    }
 }
 
  

@@ -18,20 +18,25 @@ module.exports = async (client, interaction, args) => {
         type: 'editreply'
     }, interaction);
 
-    Schema.findOne({ Guild: interaction.guild.id, Parent: target.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Parent: target.id });
         if (data) {
-            Schema.findOne({ Guild: interaction.guild.id, User: data.Parent }, async (err, data2) => {
-                if (data2) {
+            try {
+        const data2 = await Schema.findOne({ Guild: interaction.guild.id, User: data.Parent });
+        if (data2) {
                     client.embed({ title: `👪・Disowned`, desc: `${author} has disowned <@!${data.Parent}>`, type: 'editreply' }, interaction);
 
                     data.Parent = null;
                     data.save();
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans disown.js:', err);
+    }
         }
         else {
-            Schema.findOne({ Guild: interaction.guild.id, User: author.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: author.id });
+        if (data) {
                     if (data.Children.includes(target.username)) {
                         const filtered = data.Children.filter((user) => user !== target.username);
 
@@ -41,13 +46,15 @@ module.exports = async (client, interaction, args) => {
                             Children: filtered
                         });
 
-                        Schema.findOne({ Guild: interaction.guild.id, Parent: author.id }, async (err, data) => {
-                            if (data) {
+                        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Parent: author.id });
+        if (data) {
                                 data.Parent = null;
                                 data.save();
                             }
-                        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans disown.js:', err);
+    }
                         client.embed({ title: `👪・Disowned`, desc: `${author} has disowned <@!${target.id}>`, type: 'editreply' }, interaction);
                     }
                     else {
@@ -57,9 +64,13 @@ module.exports = async (client, interaction, args) => {
                 else {
                     client.errNormal({ error: "You have no children/parents at the moment", type: 'editreply' }, interaction);
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans disown.js:', err);
+    }
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans disown.js:', err);
+    }
 }
 
  

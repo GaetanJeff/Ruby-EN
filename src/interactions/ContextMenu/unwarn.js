@@ -32,8 +32,9 @@ module.exports = {
 
         const member = interaction.guild.members.cache.get(interaction.targetId);
 
-        Schema.findOne({ Guild: interaction.guild.id, User: member.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: member.id });
+        if (data) {
                 const menu = new Discord.StringSelectMenuBuilder()
                     .setCustomId('unwarn')
                     .setPlaceholder('Select a warning to remove');
@@ -98,6 +99,8 @@ module.exports = {
                     type: 'ephemeraledit'
                 }, interaction);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans unwarn.js:', err);
+    }
     },
 };

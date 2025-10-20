@@ -12,7 +12,8 @@ module.exports = async (client, interaction, args) => {
 
     client.radioStart(channel);
 
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data) {
             data.Channel = channel.id;
             data.save();
@@ -23,8 +24,9 @@ module.exports = async (client, interaction, args) => {
                 Channel: channel.id,
             }).save();
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans play.js:', err);
+    }
     client.embed({
         title: `📻・Started radio`,
         desc: `Radio has started successfully \nTo make the bot leave do: \`rleave\``,

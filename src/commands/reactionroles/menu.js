@@ -9,7 +9,8 @@ module.exports = async (client, interaction, args) => {
     const lower = category.toLowerCase();
     const upper = lower.charAt(0).toUpperCase() + lower.substring(1);
 
-    Schema.findOne({ Guild: interaction.guild.id, Category: category }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Category: category });
         if (!data) return client.errNormal({ 
             error: `No data found!`,
             type: 'editreply'
@@ -69,7 +70,9 @@ module.exports = async (client, interaction, args) => {
             text: "Reaction panel successfully created!",
             type: 'ephemeraledit'
         }, interaction);
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans menu.js:', err);
+    }
 }
 
  

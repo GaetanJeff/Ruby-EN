@@ -76,7 +76,8 @@ module.exports = (client) => {
     client.on(Discord.Events.ClientReady, async () => {
         client.startStream(process.env.RADIO || "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO538");
         
-        Schema.find(async (err, data) => {
+        try {
+            const data = await Schema.find();
             if (data) {
                 for (var i = 0; i < data.length; i++) {
                     try {
@@ -89,7 +90,9 @@ module.exports = (client) => {
                     catch { }
                 }
             }
-        })
+        } catch (err) {
+            console.error('Erreur lors du chargement des données radio:', err);
+        }
     });
 }
 

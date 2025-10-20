@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const fetch = require("../../utils/fetch.js");
 const generator = require('generate-password');
 
 module.exports = async (client, interaction, args) => {

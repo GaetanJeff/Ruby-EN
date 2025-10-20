@@ -13,7 +13,8 @@ module.exports = async (client, interaction, args) => {
     var member = interaction.options.getUser('user');
     var Case = interaction.options.getInteger('case');
 
-    Schema.findOne({ Guild: interaction.guild.id, User: member.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: member.id });
         if (data) {
             var warn = data.Warnings.find(x => x.Case == Case);
             if (!warn) {
@@ -32,8 +33,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans unwarn.js:', err);
+    }
     client.embed({
         title: `🔨・Unwarn`,
         desc: `You've been unwarned in **${interaction.guild.name}**`,

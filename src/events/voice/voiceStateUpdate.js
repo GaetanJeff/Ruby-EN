@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const voiceSchema = require("../../database/models/voice");
 const channelSchema = require("../../database/models/voiceChannels");
 
-module.exports = (client, oldState, newState) => {
+module.exports = async (client, oldState, newState) => {
     if (oldState.channelId == newState.channelId) {
         if (oldState.serverDeaf == false && newState.selfDeaf == true) return;
         if (oldState.serverDeaf == true && newState.selfDeaf == false) return;
@@ -20,10 +20,12 @@ module.exports = (client, oldState, newState) => {
 
     var guildID = newState.guild.id || oldState.guild.id;
 
-    voiceSchema.findOne({ Guild: guildID }, async (err, data) => {
+    try {
+        const data = await voiceSchema.findOne({ Guild: guildID });
         if (data) {
-            channelSchema.findOne({ Guild: guildID, Channel: oldState.channelId }, async (err, data2) => {
-                if (data2) {
+            try {
+        const data2 = await channelSchema.findOne({ Guild: guildID, Channel: oldState.channelId });
+        if (data2) {
                     let channel = client.channels.cache.get(data2.Channel);
                     let memberCount = channel.members.size;
 
@@ -46,15 +48,17 @@ module.exports = (client, oldState, newState) => {
                         catch { }
                     }
                 }
-            })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans voiceStateUpdate.js:', err);
+    }
             const user = await client.users.fetch(newState.id);
             const member = newState.guild.members.cache.get(user.id);
 
             try {
                 if (newState.channel.id === data.Channel) {
-                    channelSchema.findOne({ Guild: guildID, Channel: oldState.channelId }, async (err, data2) => {
-                        if (data2) {
+                    try {
+        const data2 = await channelSchema.findOne({ Guild: guildID, Channel: oldState.channelId });
+        if (data2) {
                             let channel = client.channels.cache.get(data2.Channel);
                             let memberCount = channel.members.size;
 
@@ -74,8 +78,9 @@ module.exports = (client, oldState, newState) => {
                                 catch { }
                             }
                         }
-                    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans voiceStateUpdate.js:', err);
+    }
                     if (data.ChannelCount) {
                         data.ChannelCount += 1;
                         data.save();
@@ -108,8 +113,9 @@ module.exports = (client, oldState, newState) => {
                     }).save();
                 }
                 else {
-                    channelSchema.findOne({ Guild: guildID, Channel: oldState.channelID }, async (err, data2) => {
-                        if (data2) {
+                    try {
+        const data2 = await channelSchema.findOne({ Guild: guildID, Channel: oldState.channelID });
+        if (data2) {
                             let channel = client.channels.cache.get(data2.Channel);
                             let memberCount = channel.members.size;
 
@@ -129,10 +135,14 @@ module.exports = (client, oldState, newState) => {
                                 catch { }
                             }
                         }
-                    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans voiceStateUpdate.js:', err);
+    }
                 }
             }
             catch { }
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans voiceStateUpdate.js:', err);
+    }
 }

@@ -11,7 +11,8 @@ module.exports = async (client, interaction, args) => {
     let type = 'reply';
     if (interaction.isCommand()) type = 'editreply';
 
-    ticketChannels.findOne({ Guild: interaction.guild.id, creator: interaction.user.id, resolved: false }, async (err, data) => {
+    try {
+        const data = await ticketChannels.findOne({ Guild: interaction.guild.id, creator: interaction.user.id, resolved: false });
         if (data) {
             if (interaction.isCommand()) {
                 return client.errNormal({
@@ -25,8 +26,9 @@ module.exports = async (client, interaction, args) => {
             }, interaction);
         }
         else {
-            ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, TicketData) => {
-                if (TicketData) {
+            try {
+        const TicketData = await ticketSchema.findOne({ Guild: interaction.guild.id });
+        if (TicketData) {
                     const logsChannel = interaction.guild.channels.cache.get(TicketData.Logs);
                     const ticketCategory = interaction.guild.channels.cache.get(TicketData.Category);
                     const ticketRole = interaction.guild.roles.cache.get(TicketData.Role);
@@ -212,9 +214,13 @@ module.exports = async (client, interaction, args) => {
                         type: type
                     }, interaction);
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans create.js:', err);
+    }
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans create.js:', err);
+    }
 }
 
  

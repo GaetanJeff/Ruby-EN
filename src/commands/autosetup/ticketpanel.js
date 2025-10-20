@@ -3,7 +3,8 @@ const Discord = require('discord.js');
 const ticketSchema = require("../../database/models/tickets");
 
 module.exports = async (client, interaction, args) => {
-    ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, ticketData) => {
+    try {
+        const ticketData = await ticketSchema.findOne({ Guild: interaction.guild.id });
         if (ticketData) {
             const channel = interaction.guild.channels.cache.get(ticketData.Channel);
             const button = new Discord.ButtonBuilder()
@@ -32,7 +33,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans ticketpanel.js:', err);
+    }
 }
 
  

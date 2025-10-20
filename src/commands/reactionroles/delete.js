@@ -5,7 +5,8 @@ const Schema = require("../../database/models/reactionRoles");
 module.exports = async (client, interaction, args) => {
     const category = interaction.options.getString('category');
 
-    Schema.findOne({ Guild: interaction.guild.id, Category: category }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Category: category });
         if (!data) return client.errNormal({ 
             error: `No data found!`,
             type: 'editreply'
@@ -17,7 +18,9 @@ module.exports = async (client, interaction, args) => {
             text: `**${category}** successfully deleted!`,
             type: 'editreply'
         }, interaction);
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
+    }
 }
 
  

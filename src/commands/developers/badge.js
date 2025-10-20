@@ -51,11 +51,14 @@ module.exports = async (client, interaction, args) => {
 
             array.push(FLAG);
 
-            model.findOne({ User: member.id }, async (err, data) => {
-                if (err) console.log(err);
+            try {
+            const data = await model.findOne({ User: member.id });
+        if (err) console.log(err);
                 data.FLAGS = array
                 data.save();
-            });
+    } catch (err) {
+        console.error('Erreur Mongoose dans badge.js:', err);
+    }
 
             client.succNormal({
                 text: `Added the ${badgeFlags[badge.toUpperCase()]} (${badge.toUpperCase()}) badge!`,
@@ -111,14 +114,14 @@ module.exports = async (client, interaction, args) => {
             }, interaction);
 
         } else {
-            model.findOne(
-                { User: member.id },
-                async (err, data) => {
-                    if (err) console.log(err);
+            try {
+            const data = await model.findOne({ User: member.id });
+        if (err) console.log(err);
                     data.FLAGS = array
                     data.save();
-                }
-            );
+    } catch (err) {
+        console.error('Erreur Mongoose dans badge.js:', err);
+    }
             client.succNormal({
                 text: `Removed the ${badgeFlags[badge.toUpperCase()]} (${badge.toUpperCase()}) badge!`,
                 type: 'editreply'

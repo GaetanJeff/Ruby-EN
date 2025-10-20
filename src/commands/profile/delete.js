@@ -2,8 +2,8 @@ const Schema = require('../../database/models/profile');
 
 module.exports = async (client, interaction, args) => {
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
-
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
             Schema.findOneAndDelete({ Guild: interaction.guild.id, User: interaction.user.id }).then(() => {
                 client.succNormal({
@@ -18,7 +18,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction)
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
+    }
 }
 
  

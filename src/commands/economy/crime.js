@@ -8,7 +8,8 @@ module.exports = async (client, interaction, args) => {
     let user = interaction.user;
     let timeout = 600000;
 
-    Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
+    try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
         if (dataTime && dataTime.Crime !== null && timeout - (Date.now() - dataTime.Crime) > 0) {
             let time = (dataTime.Crime / 1000 + timeout / 1000).toFixed(0);
             return client.errWait({
@@ -74,7 +75,9 @@ module.exports = async (client, interaction, args) => {
                 }
             }
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans crime.js:', err);
+    }
 }
 
  

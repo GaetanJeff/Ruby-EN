@@ -1,11 +1,8 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 
-const { Manager } = require("erela.js");
-const Spotify = require("erela.js-spotify");
-const Facebook = require("erela.js-facebook");
-const Deezer = require("erela.js-deezer");
-const AppleMusic = require("erela.js-apple");
+// Charger les variables d'environnement
+require('dotenv').config();
 
 // Discord client
 const client = new Discord.Client({
@@ -48,62 +45,6 @@ const client = new Discord.Client({
     ],
     restTimeOffset: 0
 });
-
-
-const clientID = process.env.SPOTIFY_CLIENT_ID;
-const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-if (clientID && clientSecret) {
-    // Lavalink client
-    client.player = new Manager({
-        plugins: [
-            new AppleMusic(),
-            new Deezer(),
-            new Facebook(),
-            new Spotify({
-                clientID,
-                clientSecret,
-            })
-        ],
-        nodes: [
-            {
-                host: process.env.LAVALINK_HOST || "localhost",
-                port: parseInt(process.env.LAVALINK_PORT) || 8080,
-                password: process.env.LAVALINK_PASSWORD || "gaetanlebg"
-            },
-        ],
-        send(id, payload) {
-            const guild = client.guilds.cache.get(id);
-            if (guild) guild.shard.send(payload);
-        },
-    })
-
-} else {
-    // Lavalink client
-    client.player = new Manager({
-        plugins: [
-            new AppleMusic(),
-            new Deezer(),
-            new Facebook(),
-        ],
-        nodes: [
-            {
-                host: "127.0.0.1",
-                port: 8088,
-                password: "gaetan123"
-            },
-        ],
-        send(id, payload) {
-            const guild = client.guilds.cache.get(id);
-            if (guild) guild.shard.send(payload);
-        }
-    })
-}
-const events = fs.readdirSync(`./src/events/music`).filter(files => files.endsWith('.js'));
-
-for (const file of events) {
-    const event = require(`./events/music/${file}`);
-    client.player.on(file.split(".")[0], event.bind(null, client)).setMaxListeners(0);
-};
 
 // Connect to database
 require("./database/connect")();

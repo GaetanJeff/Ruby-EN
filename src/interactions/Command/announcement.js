@@ -1,4 +1,4 @@
-const { CommandInteraction, Client } = require('discord.js');
+const { CommandInteraction, Client, InteractionResponseType } = require('discord.js');
 const { SlashCommandBuilder, ChannelType } = require('discord.js');
 const Discord = require('discord.js');
 
@@ -34,7 +34,7 @@ module.exports = {
      */
 
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ fetchReply: true });
+        await interaction.deferReply();
         const perms = await client.checkUserPerms({
             flags: [Discord.PermissionsBitField.Flags.ManageMessages],
             perms: [Discord.PermissionsBitField.Flags.ManageMessages]

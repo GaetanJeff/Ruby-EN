@@ -13,7 +13,8 @@ module.exports = async (client, interaction, args) => {
         type: 'editreply'
     }, interaction)
 
-    Schema.findOne({ Guild: interaction.guild.id, Category: category }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Category: category });
         if (data) {
             data.Roles[emoji] = [
                 role.id,
@@ -58,7 +59,9 @@ module.exports = async (client, interaction, args) => {
             ],
             type: 'editreply'
         }, interaction);
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans add.js:', err);
+    }
 }
 
  

@@ -4,7 +4,8 @@ module.exports = async (client, interaction, args) => {
 
     const age = interaction.options.getNumber('number');
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
             if (isNaN(age)) return client.errNormal({ error: "No valid number provided", type: 'editreply' }, interaction)
 
@@ -24,7 +25,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with createprofile", type:'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans age.js:', err);
+    }
 }
 
  

@@ -54,8 +54,9 @@ module.exports = async (client, interaction, args) => {
             }, i);
 
             client.removeMoney(i, i.user, parseInt(100));
-            items.findOne({ Guild: i.guild.id, User: i.user.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await items.findOne({ Guild: i.guild.id, User: i.user.id });
+        if (data) {
                     data.FishingRod = true;
                     data.save();
                 } else {
@@ -65,7 +66,9 @@ module.exports = async (client, interaction, args) => {
                         FishingRod: true,
                     }).save();
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans buy.js:', err);
+    }
             return client.succNormal({
                 text: `The purchase has been successfully completed`,
                 fields: [

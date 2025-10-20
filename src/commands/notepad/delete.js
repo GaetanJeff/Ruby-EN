@@ -7,7 +7,8 @@ module.exports = async (client, interaction, args) => {
 
     let id = interaction.options.getString('id');
 
-    Schema.findOne({ Guild: interaction.guild.id, Code: id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Code: id });
         if (data) {
             Schema.findOneAndDelete({ Guild: interaction.guild.id, Code: id }).then(() => {
                 client.succNormal({ text: `Note **#${id}** has been deleted!`, type: 'editreply' }, interaction);
@@ -16,7 +17,9 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: `No note found with the id **#${id}**`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
+    }
 }
 
  

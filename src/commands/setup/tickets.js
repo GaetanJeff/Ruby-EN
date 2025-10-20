@@ -8,7 +8,8 @@ module.exports = async (client, interaction, args) => {
     const channel = interaction.options.getChannel('channel');
     const logs = interaction.options.getChannel('logs');
 
-    ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await ticketSchema.findOne({ Guild: interaction.guild.id });
         if (data) {
             data.Category = category.id;
             data.Role = role.id;
@@ -25,8 +26,9 @@ module.exports = async (client, interaction, args) => {
                 Logs: logs.id
             }).save();
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans tickets.js:', err);
+    }
     client.succNormal({
         text: `Tickets has been set up successfully!`,
         type: 'editreply'

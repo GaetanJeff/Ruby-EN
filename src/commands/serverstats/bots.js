@@ -18,8 +18,9 @@ module.exports = async (client, interaction, args) => {
             },
         ],
     }).then(async (channel) => {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.Bots = channel.id;
                 data.save();
             }
@@ -29,8 +30,9 @@ module.exports = async (client, interaction, args) => {
                     Bots: channel.id
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans bots.js:', err);
+    }
         client.succNormal({
             text: `Bots count created!`,
             fields: [

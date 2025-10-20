@@ -5,7 +5,8 @@ const Schema = require("../../database/models/economy");
 module.exports = async (client, interaction, args) => {
     let user = interaction.user;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             function isOdd(num) {
                 if ((num % 2) == 0) return false;
@@ -62,5 +63,7 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: `You has no ${client.emotes.economy.coins}!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans roulette.js:', err);
+    }
 }

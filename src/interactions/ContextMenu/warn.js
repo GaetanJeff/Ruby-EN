@@ -69,8 +69,9 @@ module.exports = {
             }
         });
 
-        Schema.findOne({ Guild: interaction.guild.id, User: member.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: member.id });
+        if (data) {
                 data.Warnings.push({
                     Moderator: interaction.user.id,
                     Reason: submitted.fields.getTextInputValue("reason"),
@@ -91,8 +92,9 @@ module.exports = {
                     }]
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans warn.js:', err);
+    }
         client.embed({
             title: `🔨・Warn`,
             desc: `You've been warned in **${interaction.guild.name}**`,

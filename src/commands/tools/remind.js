@@ -9,7 +9,8 @@ module.exports = async (client, interaction, args) => {
 
     const endtime = new Date().getTime() + ms(time);
 
-    Schema.findOne({ Text: text, User: interaction.user.id, endTime: endtime }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Text: text, User: interaction.user.id, endTime: endtime });
         if (data) {
             return client.errNormal({ error: `You already made this reminder!`, type: 'editreply' }, interaction);
         }
@@ -30,8 +31,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans remind.js:', err);
+    }
     setTimeout(async () => {
 
         client.embed({

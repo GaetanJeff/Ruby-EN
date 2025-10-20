@@ -5,7 +5,8 @@ const Schema = require("../../database/models/messages");
 module.exports = async (client, interaction, args) => {
     let user = interaction.options.getUser('user') || interaction.user;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+            const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             client.embed({
                 title: "💬・Messages",
@@ -20,7 +21,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction)
         }
-    });
+    } catch (err) {
+        console.error('Erreur Mongoose dans show.js:', err);
+    }
 }
 
  

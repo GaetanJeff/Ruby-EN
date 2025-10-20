@@ -5,7 +5,8 @@ const Schema = require("../../database/models/guessWord");
 module.exports = async (client, interaction, args) => {
     let wordList = client.config.wordList;
 
-    Schema.findOne({ Guild: interaction.guild.id, Channel: interaction.channel.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Channel: interaction.channel.id });
         if (data) {
             try {
                 wordList = wordList.split("\n");
@@ -33,7 +34,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction)
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans skipword.js:', err);
+    }
 }
 
  

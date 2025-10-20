@@ -8,7 +8,8 @@ module.exports = async (client, interaction, args) => {
     let timeout = 604800000;
 
 
-    Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
+    try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
         if (dataTime && dataTime.Present !== null && timeout - (Date.now() - dataTime.Present) > 0) {
             let time = (dataTime.Present / 1000 + timeout / 1000).toFixed(0);
             return client.errWait({
@@ -45,7 +46,9 @@ module.exports = async (client, interaction, args) => {
 
             client.addMoney(interaction, user, amount);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans present.js:', err);
+    }
 }
 
  

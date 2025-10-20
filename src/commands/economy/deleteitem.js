@@ -14,7 +14,8 @@ module.exports = async (client, interaction, args) => {
 
     if (!role) return client.errUsage({ usage: "deleteitem [role]", type: 'editreply' }, interaction);
 
-    store.findOne({ Guild: interaction.guild.id, Role: role.id }, async (err, storeData) => {
+    try {
+        const storeData = await store.findOne({ Guild: interaction.guild.id, Role: role.id });
         if (storeData) {
 
             var remove = await store.deleteOne({ Guild: interaction.guild.id, Role: role.id });
@@ -37,7 +38,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans deleteitem.js:', err);
+    }
 }
 
  

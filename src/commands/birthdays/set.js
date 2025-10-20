@@ -35,7 +35,8 @@ module.exports = async (client, interaction, args) => {
     const convertedMonth = months[month];
     const birthdayString = `${convertedDay} of ${convertedMonth}`;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
         if (data) {
             data.Birthday = birthdayString;
             data.save();
@@ -47,8 +48,9 @@ module.exports = async (client, interaction, args) => {
                 Birthday: birthdayString
             }).save();
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans set.js:', err);
+    }
     client.succNormal({ 
         text: `Birthday has been set successfully`,
         fields: [

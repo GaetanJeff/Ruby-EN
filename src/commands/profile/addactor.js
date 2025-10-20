@@ -4,7 +4,8 @@ module.exports = async (client, interaction, args) => {
 
     const actor = interaction.options.getString('actor');
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
 
             if (data && data.Actors) {
@@ -31,8 +32,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with createprofile", type:'editreply' }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans addactor.js:', err);
+    }
 }
 
  

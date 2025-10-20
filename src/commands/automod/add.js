@@ -5,7 +5,8 @@ const Schema = require("../../database/models/blacklist");
 module.exports = async (client, interaction, args) => {
     const word = interaction.options.getString('word');
 
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data) {
             if (data.Words.includes(word)) {
                 return client.errNormal({ 
@@ -23,8 +24,9 @@ module.exports = async (client, interaction, args) => {
                 Words: word
             }).save();
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans add.js:', err);
+    }
     client.succNormal({
         text: `Word is now blacklisted!`,
         fields: [

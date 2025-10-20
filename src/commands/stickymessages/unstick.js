@@ -5,7 +5,8 @@ const Schema = require("../../database/models/stickymessages");
 module.exports = async (client, interaction, args) => {
     const channel = interaction.options.getChannel('channel');
 
-    Schema.findOne({ Guild: interaction.guild.id, Channel: channel.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Channel: channel.id });
         if (data) {
             Schema.findOneAndDelete({ Guild: interaction.guild.id, Channel: channel.id }).then(() => {
                 client.succNormal({
@@ -26,7 +27,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction)
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans unstick.js:', err);
+    }
 }
 
  

@@ -42,11 +42,14 @@ module.exports = async (client, channel) => {
     }, logsChannel).catch(() => { })
 
     try {
-        ticketChannels.findOne({ Guild: channel.guild.id, channelID: channel.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await ticketChannels.findOne({ Guild: channel.guild.id, channelID: channel.id });
+        if (data) {
                 var remove = await ticketChannels.deleteOne({ Guild: channel.guild.id, channelID: channel.id });
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans channelDelete.js:', err);
+    }
     }
     catch { }
 };

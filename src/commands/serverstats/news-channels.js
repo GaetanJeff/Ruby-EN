@@ -16,8 +16,9 @@ module.exports = async (client, interaction, args) => {
             },
         ],
     }).then(async (channel) => {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.NewsChannels = channel.id;
                 data.save();
             }
@@ -27,8 +28,9 @@ module.exports = async (client, interaction, args) => {
                     NewsChannels: channel.id
                 }).save();
             }
-        })
-        
+    } catch (err) {
+        console.error('Erreur Mongoose dans news-channels.js:', err);
+    }
         client.succNormal({
             text: `News channel count created!`,
             fields: [

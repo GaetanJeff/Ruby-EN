@@ -14,7 +14,8 @@ module.exports = async (client, interaction, args) => {
     let type = 'reply';
     if (interaction.isCommand()) type = 'editreply';
 
-    ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await ticketSchema.findOne({ Guild: interaction.guild.id });
         if (data) {
             const ticketCategory = interaction.guild.channels.cache.get(data.Category);
 
@@ -31,11 +32,14 @@ module.exports = async (client, interaction, args) => {
                     type: type
                 }, interaction).then(msg => setTimeout(() => {
                     interaction.channel.delete();
-                    ticketChannels.findOne({ Guild: interaction.guild.id, channelID: interaction.channel.id }, async (err, data) => {
-                        if (data) {
+                    try {
+        const data = await ticketChannels.findOne({ Guild: interaction.guild.id, channelID: interaction.channel.id });
+        if (data) {
                             var remove = await ticketChannels.deleteOne({ Guild: interaction.guild.id, channelID: interaction.channel.id });
                         }
-                    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
+    })
                 }, 5000));
             }
             else {
@@ -51,6 +55,8 @@ module.exports = async (client, interaction, args) => {
                 type: type
             }, interaction)
         }
+    } catch (err) {
+        console.error('Erreur Mongoose dans delete.js:', err);
     })
 }
 

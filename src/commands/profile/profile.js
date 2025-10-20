@@ -45,7 +45,8 @@ module.exports = async (client, interaction, args) => {
 
     const user = interaction.options.getUser('user') || interaction.user;
 
-    Schema.findOne({ User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: user.id });
         if (data) {
             let Badges = await model.findOne({ User: user.id });
 
@@ -172,7 +173,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with /profile create", type:'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans profile.js:', err);
+    }
 }
 
  

@@ -25,7 +25,8 @@ module.exports = async (client, interaction, args) => {
         type: 'editreply'
     }, interaction)
 
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data) {
             data.Color = `#${color}`;
             data.save();
@@ -36,8 +37,9 @@ module.exports = async (client, interaction, args) => {
                 Color: `#${color}`
             }).save();
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans setcolor.js:', err);
+    }
     client.succNormal({
         text: `The embed color has been adjusted successfully`,
         fields: [

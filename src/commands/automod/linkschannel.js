@@ -7,8 +7,9 @@ module.exports = async (client, interaction, args) => {
     const channel = interaction.options.getChannel('channel');
 
     if (type == "add") {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 if (data.Channels.includes(channel.id)) {
                     return client.errNormal({
                         error: `The channel ${channel} is already in the database!`,
@@ -25,8 +26,9 @@ module.exports = async (client, interaction, args) => {
                     Channels: channel.id
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans linkschannel.js:', err);
+    }
         client.succNormal({
             text: `Channel has been added to the whitelist!`,
             fields: [
@@ -39,8 +41,9 @@ module.exports = async (client, interaction, args) => {
         }, interaction);
     }
     else if (type == "remove") {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 if (!data.Channels.includes(channel.id)) {
                     return client.errNormal({
                         error: `The channel ${channel} doesn't exist in the database!`,
@@ -73,7 +76,9 @@ module.exports = async (client, interaction, args) => {
                     type: 'editreply'
                 }, interaction);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans linkschannel.js:', err);
+    }
     }
 }
 

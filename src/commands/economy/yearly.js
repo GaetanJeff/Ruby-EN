@@ -8,8 +8,9 @@ module.exports = async (client, interaction, args) => {
   let timeout = 31557600000;
   let amount = 5000;
 
-  Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
-    if (dataTime && dataTime.Yearly !== null && timeout - (Date.now() - dataTime.Yearly) > 0) {
+  try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (dataTime && dataTime.Yearly !== null && timeout - (Date.now() - dataTime.Yearly) > 0) {
       let time = (dataTime.Yearly / 1000 + timeout / 1000).toFixed(0);
       return client.errWait({
         time: time,
@@ -48,7 +49,9 @@ module.exports = async (client, interaction, args) => {
 
       client.addMoney(interaction, user, amount);
     }
-  })
+    } catch (err) {
+        console.error('Erreur Mongoose dans yearly.js:', err);
+    }
 }
 
  

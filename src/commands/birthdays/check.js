@@ -3,7 +3,8 @@ const Discord = require('discord.js');
 const Schema = require("../../database/models/birthday");
 
 module.exports = async (client, interaction, args) => {
-    Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
         if (!data) return client.errNormal({ 
             error: "No birthday found!",
             type: 'editreply' 
@@ -14,7 +15,9 @@ module.exports = async (client, interaction, args) => {
             desc: `${interaction.user.username} birthday is on ${data.Birthday}`,
             type: 'editreply'
         }, interaction)
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans check.js:', err);
+    }
 }
 
  

@@ -1,52 +1,111 @@
-const Discord = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
-module.exports = async (client, interaction, args) => {
-    const player = client.player.players.get(interaction.guild.id);
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('queue')
+        .setDescription('Affiche la file d\'attente musicale'),
 
-    const channel = interaction.member.voice.channel;
-    if (!channel) return client.errNormal({
-        error: `You're not in a voice channel!`,
-        type: 'editreply'
-    }, interaction);
+    options: {
+        cooldown: 3,
+        isEphemeral: false,
+    },
 
-    if (player && (channel.id !== player?.voiceChannel)) return client.errNormal({
-        error: `You're not in the same voice channel!`,
-        type: 'editreply'
-    }, interaction);
+    run: async (client, interaction) => {
+        try {
+            const member = interaction.member;
 
-    if (!player || !player.queue.current) return client.errNormal({
-        error: "There are no songs playing in this server",
-        type: 'editreply'
-    }, interaction);
-
-    let count = 0;
-    let status;
-
-    if (player.queue.length == 0) {
-        status = "No more music in the queue";
-    }
-    else {
-        status = player.queue.map((track) => {
-            count += 1;
-            return (`**[#${count}]**┆${track.title.length >= 45 ? `${track.title.slice(0, 45)}...` : track.title} (Requested by <@!${track.requester.id}>)`);
-        }).join("\n");
-    }
-
-    if (player.queue.current.thumbnail) thumbnail = player.queue.current.thumbnail;
-    else thumbnail = interaction.guild.iconURL({ size: 1024 });
-
-    client.embed({
-        title: `${client.emotes.normal.music}・Songs queue - ${interaction.guild.name}`,
-        desc: status,
-        thumbnail: thumbnail,
-        fields: [
-            {
-                name: `${client.emotes.normal.music} Current song:`,
-                value: `${player.queue.current.title} (Requested by <@!${player.queue.current.requester.id}>)`
+            // Vérifier si l'utilisateur est dans un canal vocal
+            if (!member.voice.channel) {
+                return client.errNormal({
+                    error: 'Vous devez être dans un canal vocal pour utiliser cette commande.',
+                    type: 'reply'
+                }, interaction);
             }
-        ],
-        type: 'editreply'
-    }, interaction)
-}
 
- 
+            // Récupérer la queue du serveur
+            const serverQueue = client.queue.get(interaction.guild.id);
+            
+            if (!serverQueue || !serverQueue.songs || serverQueue.songs.length === 0) {
+                return client.errNormal({
+                    error: 'Il n\'y a aucune musique dans la file d\'attente actuellement.',
+                    type: 'reply'
+                }, interaction);
+            }
+
+            // Créer l'embed pour afficher la queue
+            const embed = new EmbedBuilder()
+                .setTitle('🎵 File d\'attente musicale')
+                .setColor(client.config.colors.normal)
+                .setTimestamp();
+
+            // Chanson en cours
+            const current = serverQueue.currentSong || serverQueue.songs[0];
+            if (current) {
+                embed.addFields({
+                    name: '🎶 En cours de lecture',
+                    value: `**${current.title}**\nDemandée par: ${current.requestedBy}\nDurée: ${formatDuration(current.duration)}`,
+                    inline: false
+                });
+            }
+
+            // Prochaines chansons (en ignorant la première si elle est en cours)
+            const upcoming = serverQueue.songs.slice(serverQueue.currentSong ? 0 : 1);
+            if (upcoming.length > 0) {
+                let queueList = '';
+                const maxToShow = 10; // Limiter à 10 chansons pour éviter un embed trop long
+                
+                for (let i = 0; i < Math.min(upcoming.length, maxToShow); i++) {
+                    const song = upcoming[i];
+                    queueList += `**${i + 1}.** ${song.title}\n`;
+                    queueList += `*Demandée par: ${song.requestedBy} • ${formatDuration(song.duration)}*\n\n`;
+                }
+
+                if (upcoming.length > maxToShow) {
+                    queueList += `*... et ${upcoming.length - maxToShow} autres chansons*`;
+                }
+
+                embed.addFields({
+                    name: `⏭️ Prochaines (${upcoming.length})`,
+                    value: queueList || 'Aucune chanson en attente',
+                    inline: false
+                });
+            }
+
+            // Informations supplémentaires
+            embed.addFields(
+                { name: '🔊 Canal vocal', value: serverQueue.voiceChannel.name, inline: true },
+                { name: '👥 Utilisateurs connectés', value: serverQueue.voiceChannel.members.size.toString(), inline: true },
+                { name: '📊 Total dans la queue', value: serverQueue.songs.length.toString(), inline: true }
+            );
+
+            // Ajouter une thumbnail si disponible
+            if (current && current.thumbnail) {
+                embed.setThumbnail(current.thumbnail);
+            }
+
+            return interaction.reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error(`Erreur dans la commande queue:`, error);
+            return client.errNormal({
+                error: `Une erreur est survenue: ${error.message}`,
+                type: 'reply'
+            }, interaction);
+        }
+    }
+};
+
+// Fonction helper pour formater la durée
+function formatDuration(seconds) {
+    if (!seconds || isNaN(seconds)) return 'N/A';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+}

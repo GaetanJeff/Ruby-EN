@@ -10,8 +10,9 @@ module.exports = async (client, interaction, args) => {
         .setDescription(`${content}`)
         .setColor(client.config.colors.normal);
     channel.send({ embeds: [embed] }).then(msg => {
-        Schema.findOne({ Guild: interaction.guild.id, Channel: channel.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Channel: channel.id });
+        if (data) {
                 data.Channel = channel.id;
                 data.Content = content;
                 data.LastMessage = msg.id;
@@ -25,7 +26,9 @@ module.exports = async (client, interaction, args) => {
                     Content: content,
                 }).save();
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans stick.js:', err);
+    })
 
         client.succNormal({
             text: "Sticky message created",

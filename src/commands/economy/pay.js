@@ -16,7 +16,8 @@ module.exports = async (client, interaction, args) => {
         }, interaction)
     }
 
-    Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
         if (data) {
             if (data.Money < parseInt(amount)) return client.errNormal({ error: `You don't have that much money!`, type: 'editreply' }, interaction);
 
@@ -47,7 +48,9 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ text: `You don't have any money!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans pay.js:', err);
+    }
 }
 
  

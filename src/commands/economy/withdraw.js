@@ -13,7 +13,8 @@ module.exports = async (client, interaction, args) => {
 
     if (amount < 0) return client.errNormal({ error: `You can't withdraw negative money!`, type: 'editreply' }, interaction);
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             if (data.Bank === 0) return client.errNormal({ error: `You have nothing left in the bank!`, type: 'editreply' }, interaction);
 
@@ -38,6 +39,8 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ text: `You don't have any money to withdraw!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans withdraw.js:', err);
+    }
 }
  

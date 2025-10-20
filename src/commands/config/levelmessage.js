@@ -28,8 +28,9 @@ module.exports = async (client, interaction, args) => {
     }
 
     if (message.toUpperCase() == "DEFAULT") {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 Schema.findOneAndDelete({ Guild: interaction.guild.id }).then(() => {
                     client.succNormal({ 
                         text: `Level message deleted!`,
@@ -37,11 +38,14 @@ module.exports = async (client, interaction, args) => {
                     }, interaction);
                 })
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans levelmessage.js:', err);
+    }
     }
     else {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.Message = message;
                 data.save();
             }
@@ -63,7 +67,9 @@ module.exports = async (client, interaction, args) => {
                 ],
                 type: 'editreply'
             }, interaction)
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans levelmessage.js:', err);
+    }
     }
 }
 

@@ -21,7 +21,8 @@ module.exports = async (client, interaction, args) => {
 
     const bday = `${day}/${month}`;
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
             data.Birthday = bday;
             data.save();
@@ -39,7 +40,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with createprofile", type:'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans bday.js:', err);
+    }
 }
 
  

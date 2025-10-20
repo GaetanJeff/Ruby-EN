@@ -62,8 +62,9 @@ module.exports = async (client, interaction, args) => {
     interaction.channel.awaitMessageComponent({ filter, componentType: Discord.ComponentType.Button, time: 60000 }).then(async i => {
         if (i.customId == "adopt_yes") {
 
-            Schema.findOne({ Guild: interaction.guild.id, User: author.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: author.id });
+        if (data) {
                     data.Children.push(target.username);
                     data.save();
                 }
@@ -74,10 +75,12 @@ module.exports = async (client, interaction, args) => {
                         Children: target.username
                     }).save();
                 }
-            })
-
-            Schema.findOne({ Guild: interaction.guild.id, User: target.id }, async (err, data) => {
-                if (data) {
+    } catch (err) {
+        console.error('Erreur Mongoose dans adopt.js:', err);
+    }
+            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: target.id });
+        if (data) {
                     data.Parent.push(author.username);
                     data.save();
                 }
@@ -88,8 +91,9 @@ module.exports = async (client, interaction, args) => {
                         Parent: author.username
                     }).save();
                 }
-            })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans adopt.js:', err);
+    }
             client.embed({
                 title: `👪・Adoption - Approved`,
                 desc: `${author} is now the proud parent of ${target}! 🎉`,

@@ -18,8 +18,9 @@ module.exports = async (client, interaction, args) => {
                 },
             ],
         }).then((ch) => {
-            voiceSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await voiceSchema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                     data.Category = cat.id;
                     data.Channel = ch.id
                     data.ChannelName = "{emoji} {channel name}"
@@ -33,7 +34,9 @@ module.exports = async (client, interaction, args) => {
                         Category: cat.id
                     }).save();
                 }
-            });
+    } catch (err) {
+        console.error('Erreur Mongoose dans customvoice.js:', err);
+    });
 
             client.succNormal({
                 text: `Custom voice has been set up successfully!`,

@@ -6,7 +6,8 @@ module.exports = async (client, interaction, args) => {
     let user = interaction.user;
     var result = Math.ceil(Math.random() * 12);
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             let money = parseInt(interaction.options.getNumber('amount'));
             if (!money) return client.errUsage({ usage: "crash [amount]", type: 'editreply' }, interaction);
@@ -57,12 +58,15 @@ module.exports = async (client, interaction, args) => {
                     if (index === result + 1) { return }
                     else if (index === result) {
 
-                        Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
-                            if (data) {
+                        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
                                 data.Money -= money;
                                 data.save();
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans crash.js:', err);
+    })
 
                         return client.embed({
                             title: `Crash Results of ${user}`,
@@ -114,12 +118,15 @@ module.exports = async (client, interaction, args) => {
                             index = result + 1;
                             profit = money * multiplier;
 
-                            Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
-                                if (data) {
+                            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
                                     data.Money += parseInt(profit);
                                     data.save();
                                 }
-                            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans crash.js:', err);
+    })
 
                             return client.embed({
                                 desc: `Crash Results of ${user}`,
@@ -139,13 +146,15 @@ module.exports = async (client, interaction, args) => {
                     .catch(async () => {
                         index = result + 1;
 
-                        Schema.findOne({ Guild: interaction.guild.id, User: user.id },
-                            async (err, data) => {
-                                if (data) {
+                        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
                                     data.Money -= money;
                                     data.save();
                                 }
-                            }
+    } catch (err) {
+        console.error('Erreur Mongoose dans crash.js:', err);
+    }
                         )
                         return client.embed({
                             desc: `Crash Results of ${user}`,
@@ -167,5 +176,7 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: `You has no ${client.emotes.economy.coins}!`, type: 'editreply' }, interaction);
         }
+    } catch (err) {
+        console.error('Erreur Mongoose dans crash.js:', err);
     })
 }

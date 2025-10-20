@@ -8,7 +8,8 @@ module.exports = async (client, interaction, args) => {
     let timeout = 3600000;
     let amount = 10;
 
-    Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
+    try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
         if (dataTime && dataTime.Hourly !== null && timeout - (Date.now() - dataTime.Hourly) > 0) {
             let time = (dataTime.Hourly / 1000 + timeout / 1000).toFixed(0);
             return client.errWait({
@@ -44,7 +45,9 @@ module.exports = async (client, interaction, args) => {
 
             client.addMoney(interaction, user, amount);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans hourly.js:', err);
+    }
 }
 
  

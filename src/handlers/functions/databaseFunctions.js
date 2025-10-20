@@ -1,6 +1,7 @@
 module.exports = (client) => {
     client.createChannelSetup = async function (Schema, channel, interaction) {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+        try {
+            const data = await Schema.findOne({ Guild: interaction.guild.id });
             if (data) {
                 data.Channel = channel.id;
                 data.save();
@@ -11,7 +12,9 @@ module.exports = (client) => {
                     Channel: channel.id
                 }).save();
             }
-        });
+        } catch (err) {
+            console.error('Erreur Mongoose dans databaseFunctions.js:', err);
+        }
 
         client.succNormal({
             text: `Channel has been set up successfully!`,
@@ -26,7 +29,8 @@ module.exports = (client) => {
     }
 
     client.createRoleSetup = async function (Schema, role, interaction) {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+        try {
+            const data = await Schema.findOne({ Guild: interaction.guild.id });
             if (data) {
                 data.Role = role.id;
                 data.save();
@@ -37,7 +41,9 @@ module.exports = (client) => {
                     Role: role.id
                 }).save();
             }
-        });
+        } catch (err) {
+            console.error('Erreur Mongoose dans databaseFunctions.js:', err);
+        }
 
         client.succNormal({
             text: `Role has been set up successfully!`,

@@ -19,8 +19,9 @@ module.exports = async (client, interaction, args) => {
             }, interaction);
         }
 
-        Schema.findOne({ User: member.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ User: member.id });
+        if (data) {
                 return client.errNormal({
                     error: `<@!${member.id}> (${member.id}) has already been banned from the bot`,
                     type: `editreply`
@@ -50,11 +51,14 @@ module.exports = async (client, interaction, args) => {
                     embeds: [embedLogs],
                 });
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans ban.js:', err);
+    }
     }
     else if (boolean == false) {
-        Schema.findOne({ User: member.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ User: member.id });
+        if (data) {
                 Schema.findOneAndDelete({ User: member.id }).then(() => {
                     client.succNormal({
                         text: `<@!${member.id}> (${member.id}) unbanned from the bot`,
@@ -82,7 +86,9 @@ module.exports = async (client, interaction, args) => {
                     type: `editreply`
                 }, interaction);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans ban.js:', err);
+    }
     }
 }
 

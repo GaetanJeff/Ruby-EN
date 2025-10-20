@@ -10,28 +10,33 @@ module.exports = async (client, interaction, args) => {
 
     if (author.id == target.id) return client.errNormal({ error: "You cannot marry yourself!", type: 'editreply' }, interaction);
 
-    Schema.findOne({ Guild: interaction.guild.id, Partner: author.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Partner: author.id });
         if (data) {
             client.errNormal({ error: "Someone in the couple is already married!", type: 'editreply' }, interaction);
         }
         else {
-            Schema.findOne({ Guild: interaction.guild.id, Partner: target.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Partner: target.id });
+        if (data) {
                     client.errNormal({ error: "Someone in the couple is already married!", type: 'editreply' }, interaction);
                 }
                 else {
-                    Schema.findOne({ Guild: interaction.guild.id, User: target.id, Parent: author.id }, async (err, data) => {
-                        if (data) {
+                    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: target.id, Parent: author.id });
+        if (data) {
                             client.errNormal({ error: "You cannot marry a family member!", type: 'editreply' }, interaction);
                         }
                         else {
-                            Schema.findOne({ Guild: interaction.guild.id, User: author.id, Parent: target.id }, async (err, data) => {
-                                if (data) {
+                            try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: author.id, Parent: target.id });
+        if (data) {
                                     client.errNormal({ error: "You cannot marry a family member!", type: 'editreply' }, interaction);
                                 }
                                 else {
-                                    Schema.findOne({ Guild: interaction.guild.id, User: author.id }, async (err, data) => {
-                                        if (data) {
+                                    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: author.id });
+        if (data) {
                                             if (data.Children.includes(target.id)) {
                                                 client.errNormal({ error: "You cannot marry a family member!", type: 'editreply' }, interaction);
                                             }
@@ -42,16 +47,25 @@ module.exports = async (client, interaction, args) => {
                                         else {
                                             propose();
                                         }
-                                    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
                                 }
-                            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
                         }
-                    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
     function propose() {
         const row = new Discord.ActionRowBuilder()
             .addComponents(
@@ -79,8 +93,9 @@ module.exports = async (client, interaction, args) => {
         interaction.channel.awaitMessageComponent({ filter, componentType: Discord.ComponentType.Button, time: 60000 }).then(async i => {
             if (i.customId == "propose_accept") {
 
-                Schema.findOne({ Guild: interaction.guild.id, User: author.id }, async (err, data) => {
-                    if (data) {
+                try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: author.id });
+        if (data) {
                         data.Partner = target.id
                         data.save();
                     }
@@ -91,10 +106,12 @@ module.exports = async (client, interaction, args) => {
                             Partner: target.id
                         }).save();
                     }
-                })
-
-                Schema.findOne({ Guild: interaction.guild.id, User: target.id }, async (err, data) => {
-                    if (data) {
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
+                try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: target.id });
+        if (data) {
                         data.Partner = author.id
                         data.save();
                     }
@@ -105,8 +122,9 @@ module.exports = async (client, interaction, args) => {
                             Partner: author.id
                         }).save();
                     }
-                })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans propose.js:', err);
+    }
                 client.embed({
                     title: `👰・Marriage proposal - Approved`,
                     desc: `${author} and ${target} are now married! 👰🎉`,

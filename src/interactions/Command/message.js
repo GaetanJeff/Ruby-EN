@@ -33,8 +33,9 @@ module.exports = {
 
     run: async (client, interaction, args) => {
         await interaction.deferReply({ fetchReply: true });
-        model.findOne({ User: interaction.user.id }, async (err, data) => {
-            if (data && data.FLAGS.includes("DEVELOPER")) {
+        try {
+        const data = await model.findOne({ User: interaction.user.id });
+        if (data && data.FLAGS.includes("DEVELOPER")) {
 
                 const message = interaction.options.getString('message');
 
@@ -460,7 +461,9 @@ module.exports = {
             else {
                 return client.errNormal({ text: "Only Bot 2 developers are allowed to do this", editreply: true }, interaction);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans message.js:', err);
+    }
     },
 };
 

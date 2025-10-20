@@ -19,7 +19,8 @@ module.exports = async (client, interaction, args) => {
 
     if(role == interaction.guild.roles.everyone) return client.errNormal({ error: "You cannot add the everyone role to the store!", type: 'editreply' }, interaction);
 
-    store.findOne({ Guild: interaction.guild.id, Role: role.id }, async (err, storeData) => {
+    try {
+        const storeData = await store.findOne({ Guild: interaction.guild.id, Role: role.id });
         if (storeData) {
             client.errNormal({ error: `This role is already in the store!`, type: 'editreply' }, interaction);
         }
@@ -48,7 +49,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans additem.js:', err);
+    }
 }
 
  

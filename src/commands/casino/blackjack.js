@@ -5,7 +5,8 @@ const Schema = require("../../database/models/economy");
 module.exports = async (client, interaction, args) => {
     let user = interaction.user;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             let money = parseInt(interaction.options.getNumber('amount'));
 
@@ -323,5 +324,7 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: `You don't have any ${client.emotes.economy.coins}!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans blackjack.js:', err);
+    }
 }

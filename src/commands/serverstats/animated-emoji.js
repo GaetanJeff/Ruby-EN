@@ -29,8 +29,9 @@ module.exports = async (client, interaction, args) => {
             },
         ],
     }).then(async (channel) => {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.AnimatedEmojis = channel.id;
                 data.save();
             }
@@ -40,8 +41,9 @@ module.exports = async (client, interaction, args) => {
                     AnimatedEmojis: channel.id
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans animated-emoji.js:', err);
+    }
         client.succNormal({
             text: `Animated emoji's count created!`,
             fields: [

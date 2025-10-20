@@ -28,8 +28,9 @@ module.exports = async (client, member, invite, inviter) => {
             joinMessage = joinMessage.replace(`{guild:name}`, member.guild.name)
             joinMessage = joinMessage.replace(`{guild:members}`, member.guild.memberCount)
 
-            welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                if (channelData) {
+            try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                     var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -38,10 +39,13 @@ module.exports = async (client, member, invite, inviter) => {
                         desc: joinMessage
                     }, channel).catch(() => { })
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
         } else {
-            welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                if (channelData) {
+            try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                     var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -50,7 +54,9 @@ module.exports = async (client, member, invite, inviter) => {
                         desc: `I cannot trace how **${member} | ${member.user.tag}** has been joined`
                     }, channel).catch(() => { })
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
         }
     }
     else {
@@ -78,8 +84,9 @@ module.exports = async (client, member, invite, inviter) => {
                 joinMessage = joinMessage.replace(`{guild:name}`, member.guild.name)
                 joinMessage = joinMessage.replace(`{guild:members}`, member.guild.memberCount)
 
-                welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                    if (channelData) {
+                try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                         var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -88,11 +95,14 @@ module.exports = async (client, member, invite, inviter) => {
                             desc: joinMessage
                         }, channel).catch(() => { })
                     }
-                })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
             }
             else {
-                welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                    if (channelData) {
+                try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                         var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -101,18 +111,23 @@ module.exports = async (client, member, invite, inviter) => {
                             desc: `**${member} | ${member.user.tag}** was invited by ${inviter.tag} **(${data.Invites} invites)**`
                         }, channel)
                     }
-                })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
             }
 
-            rewards.findOne({ Guild: member.guild.id, Invites: data.Invites }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await rewards.findOne({ Guild: member.guild.id, Invites: data.Invites });
+        if (data) {
                     try {
                         var role = member.guild.roles.cache.get(data.Role);
                         member.roles.add(role);
                     }
                     catch { }
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
         }
         else {
             new invites({
@@ -140,8 +155,9 @@ module.exports = async (client, member, invite, inviter) => {
                 joinMessage = joinMessage.replace(`{guild:name}`, member.guild.name)
                 joinMessage = joinMessage.replace(`{guild:members}`, member.guild.memberCount)
 
-                welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                    if (channelData) {
+                try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                         var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -150,11 +166,14 @@ module.exports = async (client, member, invite, inviter) => {
                             desc: joinMessage
                         }, channel).catch(() => { })
                     }
-                })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
             }
             else {
-                welcomeSchema.findOne({ Guild: member.guild.id }, async (err, channelData) => {
-                    if (channelData) {
+                try {
+        const channelData = await welcomeSchema.findOne({ Guild: member.guild.id });
+        if (channelData) {
 
                         var channel = member.guild.channels.cache.get(channelData.Channel)
 
@@ -163,12 +182,15 @@ module.exports = async (client, member, invite, inviter) => {
                             desc: `**${member} | ${member.user.tag}** was invited by ${inviter.tag} **(1 invites)**`
                         }, channel).catch(() => { })
                     }
-                })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
             }
         }
 
-        invitedBy.findOne({ Guild: member.guild.id }, async (err, data2) => {
-            if (data2) {
+        try {
+        const data2 = await invitedBy.findOne({ Guild: member.guild.id });
+        if (data2) {
                 data2.inviteUser = inviter.id,
                     data2.User = member.id
                 data2.save();
@@ -180,6 +202,8 @@ module.exports = async (client, member, invite, inviter) => {
                     User: member.id
                 }).save();
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans inviteJoin.js:', err);
+    }
     }
 };

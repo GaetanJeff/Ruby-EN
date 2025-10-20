@@ -6,8 +6,9 @@ module.exports = async (client) => {
   client.on(Discord.Events.MessageCreate, async (message) => {
     if (message.author.bot || message.channel.type === Discord.ChannelType.DM) return;
 
-    Schema.findOne({ Guild: message.guild.id, Channel: message.channel.id }, async (err, data) => {
-      if (data) {
+    try {
+        const data = await Schema.findOne({ Guild: message.guild.id, Channel: message.channel.id });
+        if (data) {
         try {
           if (!data.lastWord || data.lastWord == " ") {
             message.react(client.emotes.normal.check);
@@ -39,6 +40,8 @@ module.exports = async (client) => {
           console.log(err);
         }
       }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans wordsnake.js:', err);
+    }
   }).setMaxListeners(0);
 }

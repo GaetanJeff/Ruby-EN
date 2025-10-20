@@ -6,7 +6,8 @@ module.exports = async (client, interaction, args) => {
 
     if (status.length > 30) return client.errNormal({ error: "Your status cannot be longer than 30 characters", type: 'editreply' }, interaction);
 
-    Schema.findOne({ User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ User: interaction.user.id });
         if (data) {
             data.Status = status;
             data.save();
@@ -24,7 +25,9 @@ module.exports = async (client, interaction, args) => {
         else {
             return client.errNormal({ error: "No profile found! Open a profile with createprofile", type:'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans status.js:', err);
+    }
 }
 
  

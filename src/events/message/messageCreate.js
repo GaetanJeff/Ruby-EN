@@ -11,7 +11,7 @@ const levelRewards = require("../../database/models/levelRewards");
 const levelLogs = require("../../database/models/levelChannels");
 const Commands = require("../../database/models/customCommand");
 const CommandsSchema = require("../../database/models/customCommandAdvanced");
-const fetch = require("node-fetch");
+const fetch = require("../../utils/fetch");
 
 /**
  * 
@@ -49,8 +49,9 @@ module.exports = async (client, message) => {
   }
 
   // Levels
-  Functions.findOne({ Guild: message.guild.id }, async (err, data) => {
-    if (data) {
+  try {
+            const data = await Functions.findOne({ Guild: message.guild.id });
+        if (data) {
       if (data.Levels == true) {
         const randomXP = Math.floor(Math.random() * 9) + 1;
         const hasLeveledUp = await client.addXP(
@@ -127,42 +128,43 @@ module.exports = async (client, message) => {
             }
           }
 
-          levelRewards.findOne(
-            { Guild: message.guild.id, Level: user.level },
-            async (err, data) => {
-              if (data) {
+          try {
+            const data = await levelRewards.findOne({ Guild: message.guild.id, Level: user.level });
+        if (data) {
                 message.guild.members.cache
                   .get(message.author.id)
                   .roles.add(data.Role)
                   .catch((e) => { });
               }
-            }
-          );
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
         }
       }
     }
-  });
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
 
   // Message tracker system
-  messagesSchema.findOne(
-    { Guild: message.guild.id, User: message.author.id },
-    async (err, data) => {
-      if (data) {
+  try {
+            const data = await messagesSchema.findOne({ Guild: message.guild.id, User: message.author.id });
+        if (data) {
         data.Messages += 1;
         data.save();
 
-        messageRewards.findOne(
-          { Guild: message.guild.id, Messages: data.Messages },
-          async (err, data) => {
-            if (data) {
+        try {
+            const rewardData = await messageRewards.findOne({ Guild: message.guild.id, Messages: data.Messages });
+        if (rewardData) {
               try {
                 message.guild.members.cache
                   .get(message.author.id)
-                  .roles.add(data.Role);
+                  .roles.add(rewardData.Role);
               } catch { }
             }
-          }
-        );
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
       } else {
         new messagesSchema({
           Guild: message.guild.id,
@@ -170,14 +172,14 @@ module.exports = async (client, message) => {
           Messages: 1,
         }).save();
       }
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
     }
-  );
 
   // AFK system
-  afk.findOne(
-    { Guild: message.guild.id, User: message.author.id },
-    async (err, data) => {
-      if (data) {
+  try {
+            const data = await afk.findOne({ Guild: message.guild.id, User: message.author.id });
+        if (data) {
         await afk.deleteOne({
           Guild: message.guild.id,
           User: message.author.id,
@@ -201,31 +203,33 @@ module.exports = async (client, message) => {
           message.member.setNickname(name).catch((e) => { });
         }
       }
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
     }
-  );
 
   message.mentions.users.forEach(async (u) => {
     if (
       !message.content.includes("@here") &&
       !message.content.includes("@everyone")
     ) {
-      afk.findOne(
-        { Guild: message.guild.id, User: u.id },
-        async (err, data) => {
-          if (data) {
+      try {
+            const data = await afk.findOne({ Guild: message.guild.id, User: u.id });
+        if (data) {
             client.simpleEmbed(
               { desc: `${u} is currently afk! **Reason:** ${data.Message}` },
               message.channel
             );
           }
-        }
-      );
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
     }
   });
 
   // Chat bot
-  chatBotSchema.findOne({ Guild: message.guild.id }, async (err, data) => {
-    if (!data) return;
+  try {
+            const data = await chatBotSchema.findOne({ Guild: message.guild.id });
+        if (!data) return;
     if (message.channel.id !== data.Channel) return;
     if (process.env.OPENAI) {
       fetch(
@@ -284,13 +288,14 @@ module.exports = async (client, message) => {
         } catch { }
       } catch { }
     }
-  });
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
 
   // Sticky messages
   try {
-    Schema.findOne(
-      { Guild: message.guild.id, Channel: message.channel.id },
-      async (err, data) => {
+    try {
+            const data = await Schema.findOne({ Guild: message.guild.id, Channel: message.channel.id });
         if (!data) return;
 
         const lastStickyMessage = await message.channel.messages
@@ -306,8 +311,9 @@ module.exports = async (client, message) => {
 
         data.LastMessage = newMessage.id;
         data.save();
-      }
-    );
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
   } catch { }
 
   // Prefix
@@ -322,10 +328,13 @@ module.exports = async (client, message) => {
   }
 
   if (!guildSettings || !guildSettings.Prefix) {
-    Functions.findOne({ Guild: message.guild.id }, async (err, data) => {
-      data.Prefix = client.config.discord.prefix;
+    try {
+            const data = await Functions.findOne({ Guild: message.guild.id });
+        data.Prefix = client.config.discord.prefix;
       data.save();
-    });
+    } catch (err) {
+        console.error('Erreur Mongoose dans messageCreate.js:', err);
+    }
 
     guildSettings = await Functions.findOne({ Guild: message.guild.id });
   }

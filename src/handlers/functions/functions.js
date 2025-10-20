@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const fetch = require("node-fetch");
+const fetch = require("../../utils/fetch.js");
 
 const Functions = require("../../database/models/functions");
 const VoiceSchema = require("../../database/models/voiceChannels");
@@ -78,22 +78,26 @@ module.exports = async (client) => {
     client.loadSubcommands = async function (client, interaction, args) {
         try {
             const data = await Functions.findOne({ Guild: interaction.guild.id });
+            const subcommand = interaction.options.getSubcommand();
+            let commandPath;
 
-            if (data.Beta == true) {
-                return require(`${process.cwd()}/src/commands/${interaction.commandName}/${interaction.options.getSubcommand()}-beta`)(client, interaction, args).catch(err => {
-                    client.emit("errorCreate", err, interaction.commandName, interaction)
-                })
+            if (data && data.Beta) {
+                commandPath = `${process.cwd()}/src/commands/${interaction.commandName}/${subcommand}-beta.js`;
+            } else {
+                commandPath = `${process.cwd()}/src/commands/${interaction.commandName}/${subcommand}.js`;
             }
-            else {
-                return require(`${process.cwd()}/src/commands/${interaction.commandName}/${interaction.options.getSubcommand()}`)(client, interaction, args).catch(err => {
-                    client.emit("errorCreate", err, interaction.commandName, interaction)
-                })
+
+            const command = require(commandPath);
+            if (typeof command.run === 'function') {
+                return command.run(client, interaction, args).catch(err => {
+                    client.emit("errorCreate", err, interaction.commandName, interaction);
+                });
+            } else {
+                throw new Error(`La commande ${subcommand} n'a pas de fonction run`);
             }
-        }
-        catch {
-            return require(`${process.cwd()}/src/commands/${interaction.commandName}/${interaction.options.getSubcommand()}`)(client, interaction, args).catch(err => {
-                client.emit("errorCreate", err, interaction.commandName, interaction)
-            })
+        } catch (error) {
+            console.error(`Erreur lors du chargement de la sous-commande:`, error);
+            client.emit("errorCreate", error, interaction.commandName, interaction);
         }
     }
 

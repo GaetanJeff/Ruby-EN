@@ -6,7 +6,8 @@ module.exports = async (client, interaction, args) => {
     let id = interaction.options.getString('id');
     let note = interaction.options.getString('note');
 
-    Schema.findOne({ Guild: interaction.guild.id, Code: id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Code: id });
         if (data) {
             data.Note = note
             data.save();
@@ -16,7 +17,9 @@ module.exports = async (client, interaction, args) => {
         else {
             client.errNormal({ error: `No note found!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans edit.js:', err);
+    }
 }
 
  

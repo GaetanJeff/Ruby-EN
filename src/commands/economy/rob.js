@@ -17,18 +17,21 @@ module.exports = async (client, interaction, args) => {
     try {
         let timeout = 600000;
 
-        Schema2.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, dataTime) => {
-            if (dataTime && dataTime.Rob !== null && timeout - (Date.now() - dataTime.Rob) > 0) {
+        try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
+        if (dataTime && dataTime.Rob !== null && timeout - (Date.now() - dataTime.Rob) > 0) {
                 let time = (dataTime.Rob / 1000 + timeout / 1000).toFixed(0);
                 return client.errWait({ time: time, type: 'editreply' }, interaction);
             }
             else {
-                Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, authorData) => {
-                    if (authorData) {
+                try {
+        const authorData = await Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
+        if (authorData) {
                         if (authorData.Money < 200) return client.errNormal({ error: `You need atleast 200 coins in your wallet to rob someone!`, type: 'editreply' }, interaction);
 
-                        Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, targetData) => {
-                            if (targetData) {
+                        try {
+        const targetData = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (targetData) {
                                 var targetMoney = targetData.Money;
                                 if (targetData = undefined || !targetData || targetMoney == 0 || targetMoney < 0) {
                                     return client.errNormal({ error: `${user.username} does not have anything you can rob!`, type: 'editreply' }, interaction);
@@ -82,11 +85,17 @@ module.exports = async (client, interaction, args) => {
                             else {
                                 return client.errNormal({ error: `${user.username} does not have anything you can rob!`, type: 'editreply' }, interaction);
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans rob.js:', err);
+    }
                     }
-                })
+    } catch (err) {
+        console.error('Erreur Mongoose dans rob.js:', err);
+    }
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans rob.js:', err);
+    }
     }
     catch { }
 }

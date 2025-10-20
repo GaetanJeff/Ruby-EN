@@ -8,8 +8,9 @@ module.exports = async (client, interaction, args) => {
   let timeout = 604800000;
   let amount = 500;
 
-  Schema2.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, dataTime) => {
-    if (dataTime && dataTime.Weekly !== null && timeout - (Date.now() - dataTime.Weekly) > 0) {
+  try {
+        const dataTime = await Schema2.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (dataTime && dataTime.Weekly !== null && timeout - (Date.now() - dataTime.Weekly) > 0) {
       let time = (dataTime.Weekly / 1000 + timeout / 1000).toFixed(0);
       return client.errWait({
         time: time,
@@ -44,7 +45,9 @@ module.exports = async (client, interaction, args) => {
 
       client.addMoney(interaction, user, amount);
     }
-  })
+    } catch (err) {
+        console.error('Erreur Mongoose dans weekly.js:', err);
+    }
 }
 
  

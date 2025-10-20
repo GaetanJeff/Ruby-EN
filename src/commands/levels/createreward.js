@@ -13,7 +13,8 @@ module.exports = async (client, interaction, args) => {
 
     if (perms == false) return;
 
-    Schema.findOne({ Guild: interaction.guild.id, Level: level }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Level: level });
         if (data) {
             return client.errNormal({ 
                 error: "This level already has a reward!",
@@ -39,7 +40,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans createreward.js:', err);
+    }
 }
 
  

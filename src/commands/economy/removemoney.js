@@ -25,8 +25,9 @@ module.exports = async (client, interaction, args) => {
     client.removeMoney(interaction, user, parseInt(amount));
 
     setTimeout(() => {
-        Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
 
                 client.succNormal({
                     text: `Removed money from a user!`,
@@ -48,7 +49,9 @@ module.exports = async (client, interaction, args) => {
             else {
                 client.errNormal({ error: `This user doesn't have any money!`, type: 'editreply' }, interaction);
             }
-        }, 500)
+    } catch (err) {
+        console.error('Erreur Mongoose dans removemoney.js:', err);
+    }, 500)
     })
 }
  

@@ -22,7 +22,8 @@ module.exports = async (client, interaction, args) => {
         }, interaction)
     }
 
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data) {
             data.ChannelTemplate = name
             data.save();
@@ -45,7 +46,9 @@ module.exports = async (client, interaction, args) => {
             ],
             type: 'editreply'
         }, interaction)
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans setchannelname.js:', err);
+    }
 }
 
  

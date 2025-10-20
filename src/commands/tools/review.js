@@ -11,7 +11,8 @@ module.exports = async (client, interaction, args) => {
         type: 'editreply'
     }, interaction)
 
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data) {
             const channel = interaction.member.guild.channels.cache.get(data.Channel);
             if (!channel) return  client.errNormal({
@@ -65,7 +66,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction)
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans review.js:', err);
+    }
 }
 
  

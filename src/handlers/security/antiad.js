@@ -6,15 +6,17 @@ const Schema2 = require("../../database/models/channelList");
 module.exports = (client) => {
     client.on(Discord.Events.MessageCreate, async (message) => {
         if (message.channel.type === Discord.ChannelType.DM || message.author.bot) return;
-        Schema.findOne({ Guild: message.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: message.guild.id });
+        if (data) {
                 if (data.AntiInvite == true) {
                     const { content } = message
 
                     const code = content.split('discord.gg/')[1]
                     if (code) {
-                        Schema2.findOne({ Guild: message.guild.id }, async (err, data2) => {
-                            if (data2) {
+                        try {
+        const data2 = await Schema2.findOne({ Guild: message.guild.id });
+        if (data2) {
                                 if (data2.Channels.includes(message.channel.id) || message.member.permissions.has(Discord.PermissionsBitField.Flags.ManageMessages)) {
                                     return;
                                 }
@@ -39,15 +41,18 @@ module.exports = (client) => {
                                     content: `${message.author}`
                                 }, message.channel)
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
                     }
                 }
                 else if (data.AntiLinks == true) {
                     const { content } = message
 
                     if (content.includes('http://') || content.includes('https://') || content.includes('www.')) {
-                        Schema2.findOne({ Guild: message.guild.id }, async (err, data2) => {
-                            if (data2) {
+                        try {
+        const data2 = await Schema2.findOne({ Guild: message.guild.id });
+        if (data2) {
                                 if (data2.Channels.includes(message.channel.id) || message.member.permissions.has(Discord.PermissionsBitField.Flags.ManageMessages)) {
                                     return;
                                 }
@@ -72,25 +77,31 @@ module.exports = (client) => {
                                     content: `${message.author}`
                                 }, message.channel)
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
                     }
                 }
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
     }).setMaxListeners(0);
 
     client.on(Discord.Events.MessageUpdate, async (oldMessage, newMessage) => {
         if (oldMessage.content === newMessage.content || newMessage.channel.type === Discord.ChannelType.DM) return;
 
-        Schema.findOne({ Guild: newMessage.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: newMessage.guild.id });
+        if (data) {
                 if (data.AntiInvite == true) {
                     const { content } = newMessage
 
                     const code = content.split('discord.gg/')[1]
                     if (code) {
-                        Schema2.findOne({ Guild: newMessage.guild.id }, async (err, data2) => {
-                            if (data2) {
+                        try {
+        const data2 = await Schema2.findOne({ Guild: newMessage.guild.id });
+        if (data2) {
                                 if (data2.Channels.includes(newMessage.channel.id) || newMessage.member.permissions.has(Discord.PermissionsBitField.Flags.ManageMessages)) {
                                     return;
                                 }
@@ -131,15 +142,18 @@ module.exports = (client) => {
                                     }
                                 }, 5000)
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
                     }
                 }
                 else if (data.AntiLinks == true) {
                     const { guild, member, content } = newMessage
 
                     if (content.includes('http://') || content.includes('https://') || content.includes('www.')) {
-                        Schema2.findOne({ Guild: newMessage.guild.id }, async (err, data2) => {
-                            if (data2) {
+                        try {
+        const data2 = await Schema2.findOne({ Guild: newMessage.guild.id });
+        if (data2) {
                                 if (data2.Channels.includes(newMessage.channel.id) || newMessage.member.permissions.has(Discord.PermissionsBitField.Flags.ManageMessages)) {
                                     return;
                                 }
@@ -180,10 +194,14 @@ module.exports = (client) => {
                                     }
                                 }, 5000)
                             }
-                        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
                     }
                 }
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antiad.js:', err);
+    }
     }).setMaxListeners(0);
 }

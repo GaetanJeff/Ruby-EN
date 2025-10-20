@@ -3,7 +3,8 @@ const Discord = require('discord.js');
 const Schema = require("../../database/models/blacklist");
 
 module.exports = async (client, interaction, args) => {
-    Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
         if (data && data.Words.length > 0) {
             client.embed({
                 title: "🤬・Blacklisted words",
@@ -17,7 +18,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans display.js:', err);
+    }
 }
 
  

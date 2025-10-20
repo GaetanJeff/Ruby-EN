@@ -1,13 +1,14 @@
 const slotItems = ["🍇", "🍉", "🍊", "🍎", "🍓", "🍒"];
 const Discord = require('discord.js');
-const ms = require("parse-ms");
+const ms = require("../../utils/parse-ms");
 
 const Schema = require("../../database/models/economy");
 
 module.exports = async (client, interaction, args) => {
     let user = interaction.user;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
         if (data) {
             let money = parseInt(interaction.options.getNumber('amount'));
             let win = false;
@@ -54,7 +55,7 @@ module.exports = async (client, interaction, args) => {
                 }, interaction)
 
                 data.Money += money;
-                data.save();
+                await data.save();
             } else {
 
                 client.embed({
@@ -66,11 +67,14 @@ module.exports = async (client, interaction, args) => {
                 }, interaction)
 
                 data.Money -= money;
-                data.save();
+                await data.save();
             }
         }
         else {
             client.errNormal({ error: `You has no ${client.emotes.economy.coins}!`, type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Error in slots command:', err);
+        client.errNormal({ error: 'An error occurred while processing your request.', type: 'editreply' }, interaction);
+    }
 }

@@ -13,8 +13,9 @@ module.exports = async (client, interaction, args) => {
     const amount = interaction.options.getNumber('amount');
 
     if (type == "add") {
-        Schema.findOne({ User: user.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ User: user.id });
+        if (data) {
                 data.Credits += amount;
                 data.save();
             }
@@ -24,8 +25,9 @@ module.exports = async (client, interaction, args) => {
                     Credits: amount
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans credits.js:', err);
+    }
         client.succNormal({
             text: `Added **${amount} credits** to ${user}`,
             type: 'editreply'
@@ -46,13 +48,15 @@ module.exports = async (client, interaction, args) => {
         });
     }
     else if (type == "remove") {
-        Schema.findOne({ User: user.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ User: user.id });
+        if (data) {
                 data.Credits -= amount;
                 data.save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans credits.js:', err);
+    }
         client.succNormal({
             text: `Removed **${amount} credits** from ${user}`,
             type: 'editreply'

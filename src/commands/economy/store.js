@@ -3,7 +3,8 @@ const Discord = require('discord.js');
 const store = require("../../database/models/economyStore");
 
 module.exports = async (client, interaction, args, message) => {
-    store.find({ Guild: interaction.guild.id }, async (err, storeData) => {
+    try {
+        const storeData = await store.find({ Guild: interaction.guild.id });
         if (storeData && storeData.length > 0) {
             const lb = storeData.map(e => `**<@&${e.Role}>** - ${client.emotes.economy.coins} $${e.Amount} \n**To buy:** \`buy ${e.Role}\``);
 
@@ -19,8 +20,13 @@ module.exports = async (client, interaction, args, message) => {
                 type: 'editreply' 
             }, interaction);
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans store.js:', err);
+        client.errNormal({ 
+            error: `An error occurred while loading the store.`, 
+            type: 'editreply' 
+        }, interaction);
+    }
 }
 
  

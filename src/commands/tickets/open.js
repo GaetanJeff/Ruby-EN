@@ -14,15 +14,17 @@ module.exports = async (client, interaction, args) => {
     let type = 'reply';
     if (interaction.isCommand()) type = 'editreply';
 
-    ticketChannels.findOne({ Guild: interaction.guild.id, channelID: interaction.channel.id }, async (err, ticketData) => {
+    try {
+        const ticketData = await ticketChannels.findOne({ Guild: interaction.guild.id, channelID: interaction.channel.id });
         if (ticketData) {
             if (ticketData.resolved == false) return client.errNormal({
                 error: "Ticket is already open!",
                 type: 'ephemeraledit'
             }, interaction);
 
-            ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-                if (data) {
+            try {
+        const data = await ticketSchema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                     const ticketCategory = interaction.guild.channels.cache.get(data.Category);
 
                     if (ticketCategory == undefined) {
@@ -68,9 +70,13 @@ module.exports = async (client, interaction, args) => {
                         type: type
                     }, interaction);
                 }
-            })
+    } catch (err) {
+        console.error('Erreur Mongoose dans open.js:', err);
+    }
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans open.js:', err);
+    }
 }
 
  

@@ -48,8 +48,9 @@ module.exports = async (client, interaction, args) => {
             return;
         }
 
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.openTicket = message;
                 data.save();
             }
@@ -59,8 +60,9 @@ module.exports = async (client, interaction, args) => {
                     openTicket: message
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans ticketmessage.js:', err);
+    }
         client.succNormal({
             text: `The ticket message has been set successfully`,
             fields: [
@@ -113,8 +115,9 @@ module.exports = async (client, interaction, args) => {
             return;
         }
 
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.dmMessage = message;
                 data.save();
             }
@@ -124,8 +127,9 @@ module.exports = async (client, interaction, args) => {
                     dmMessage: message
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans ticketmessage.js:', err);
+    }
         client.succNormal({
             text: `The ticket message has been set successfully`,
             fields: [

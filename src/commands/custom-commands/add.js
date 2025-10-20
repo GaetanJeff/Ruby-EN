@@ -5,7 +5,8 @@ module.exports = async (client, interaction, args) => {
     const cmdname = interaction.options.getString('command');
     const cmdresponce = interaction.options.getString('text');
 
-    Schema.findOne({ Guild: interaction.guild.id, Name: cmdname.toLowerCase() }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Name: cmdname.toLowerCase() });
         if (data) {
             client.errNormal({ error: "This command name is already added in guild custom commands!", type: 'editreply' }, interaction);
         }
@@ -110,8 +111,9 @@ module.exports = async (client, interaction, args) => {
                 }
             })
         }
-    })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans add.js:', err);
+    }
 }
 
  

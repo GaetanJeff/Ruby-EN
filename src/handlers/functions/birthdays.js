@@ -54,7 +54,8 @@ module.exports = (client) => {
 
                 const finalGuild = client.guilds.cache.get(Guild)
                 if (finalGuild) {
-                    birthdayChannel.findOne({ Guild: finalGuild.id }, async (err, data) => {
+                    try {
+                        const data = await birthdayChannel.findOne({ Guild: finalGuild.id });
                         if (data) {
                             const channel = finalGuild.channels.cache.get(data.Channel);
                             
@@ -63,7 +64,9 @@ module.exports = (client) => {
                                 desc: `Happy birthday to <@!${User}>!`
                             }, channel)
                         }
-                    })
+                    } catch (err) {
+                        console.error('Erreur Mongoose dans birthdays.js:', err);
+                    }
                 }
             }
         }

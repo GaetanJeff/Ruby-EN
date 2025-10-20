@@ -5,8 +5,9 @@ const itemSchema = require("../../database/models/economyItems");
 
 module.exports = async (client) => {
     client.addMoney = async function (interaction, user, amount) {
-        Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
                 data.Money += amount;
                 data.save();
             }
@@ -18,19 +19,24 @@ module.exports = async (client) => {
                     Bank: 0
                 }).save();
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans economy.js:', err);
+    }
     }
 
     client.removeMoney = async function (interaction, user, amount) {
-        Schema.findOne({ Guild: interaction.guild.id, User: user.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: user.id });
+        if (data) {
                 data.Money -= amount;
                 data.save();
             }
             else {
                 client.errNormal(`User has no ${client.emotes.economy.coins}!`, interaction.channel);
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans economy.js:', err);
+    }
     }
 
     client.buyItem = async function (interaction, user, item) {

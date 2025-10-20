@@ -5,7 +5,8 @@ const Schema = require('../../database/models/afk');
 module.exports = async (client, interaction, args) => {
     const reason = interaction.options.getString('reason') || `Not specified`;
 
-    Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, User: interaction.user.id });
         if (data) {
             return client.errNormal({ 
                 error: `You're already afk!`,
@@ -32,7 +33,9 @@ module.exports = async (client, interaction, args) => {
                 desc: `${interaction.user} is now afk! **Reason:** ${reason}` 
             }, interaction.channel)
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans set.js:', err);
+    }
 }
 
  

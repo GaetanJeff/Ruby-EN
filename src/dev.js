@@ -29,10 +29,11 @@ mongoose.connect(process.env.MONGO_TOKEN, {
     process.exit(1);
 });
 // Find the user
-model.findOne({
+try {
+        const data = await model.findOne({
     User: process.argv[2]
-}, async (err, data) => {
-    if (err) console.log(err);
+});
+        if (err) console.log(err);
     if (!data) {
         // Create a new document
         const newData = new model({
@@ -62,4 +63,6 @@ model.findOne({
         mongoose.connection.close();
         process.exit(0);
     }
-});
+    } catch (err) {
+        console.error('Erreur Mongoose dans dev.js:', err);
+    });

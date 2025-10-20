@@ -74,7 +74,6 @@ module.exports = (client) => {
     }
 
     // Missing perms
-
     client.errMissingPerms = async function ({
         embed: embed = client.templateEmbed(),
         perms: perms,
@@ -98,7 +97,6 @@ module.exports = (client) => {
     }
 
     // No bot perms
-
     client.errNoPerms = async function ({
         embed: embed = client.templateEmbed(),
         perms: perms,
@@ -122,7 +120,6 @@ module.exports = (client) => {
     }
 
     // Wait error
-
     client.errWait = async function ({
         embed: embed = client.templateEmbed(),
         time: time,
@@ -257,65 +254,81 @@ module.exports = (client) => {
         components: components,
         type: type
     }, interaction) {
-        if (type && type.toLowerCase() == "edit") {
-            return await interaction.edit({
+        try {
+            if (!interaction) {
+                console.error('Interaction non définie');
+                return null;
+            }
+
+            const options = {
                 embeds: embeds,
                 content: content,
-                components: components,
-                fetchReply: true
-            }).catch(e => { });
-        }
-        else if (type && type.toLowerCase() == "editreply") {
-            return await interaction.editReply({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true
-            }).catch(e => { });
-        }
-        else if (type && type.toLowerCase() == "reply") {
-            return await interaction.reply({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true
-            }).catch(e => { });
-        }
-        else if (type && type.toLowerCase() == "update") {
-            return await interaction.update({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true
-            }).catch(e => { });
-        }
-        else if (type && type.toLowerCase() == "ephemeraledit") {
-            return await interaction.editReply({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true,
-                ephemeral: true
-            }).catch(e => { });
-        }
-        else if (type && type.toLowerCase() == "ephemeral") {
-            return await interaction.reply({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true,
-                ephemeral: true
-            }).catch(e => { });
-        }
-        else {
-            return await interaction.send({
-                embeds: embeds,
-                content: content,
-                components: components,
-                fetchReply: true
-            }).catch(e => { });
+                components: components
+            };
+
+            // Si c'est un canal de texte
+            if (interaction instanceof Discord.TextChannel) {
+                return await interaction.send(options);
+            }
+
+            // Si c'est une interaction
+            if (interaction instanceof Discord.CommandInteraction) {
+                // Si l'interaction est déjà différée
+                if (interaction.deferred) {
+                    return await interaction.editReply(options);
+                }
+
+                // Si l'interaction a déjà reçu une réponse
+                if (interaction.replied) {
+                    return await interaction.followUp(options);
+                }
+
+                // Si c'est une nouvelle interaction
+                if (type === 'editreply') {
+                    if (!interaction.deferred && !interaction.replied) {
+                        await interaction.deferReply();
+                    }
+                    return await interaction.editReply(options);
+                }
+
+                // Par défaut, envoyer une nouvelle réponse
+                if (interaction.replied) {
+                    return await interaction.followUp(options);
+                } else if (interaction.deferred) {
+                    return await interaction.editReply(options);
+                } else {
+                    return await interaction.reply(options);
+                }
+            }
+
+            console.error('Type d\'interaction non supporté:', interaction.constructor.name);
+            return null;
+
+        } catch (error) {
+            console.error('[Shard 1] Erreur lors de l\'envoi de l\'embed:', error);
+            try {
+                const errorOptions = {
+                    content: "Une erreur est survenue lors de l'envoi du message.",
+                    flags: Discord.MessageFlags.Ephemeral
+                };
+
+                if (interaction instanceof Discord.TextChannel) {
+                    await interaction.send(errorOptions);
+                } else if (interaction instanceof Discord.CommandInteraction) {
+                    if (interaction.deferred) {
+                        await interaction.editReply(errorOptions);
+                    } else if (interaction.replied) {
+                        await interaction.followUp(errorOptions);
+                    } else {
+                        await interaction.reply(errorOptions);
+                    }
+                }
+            } catch (e) {
+                console.error('[Shard 1] Erreur lors de la gestion de l\'erreur:', e);
+            }
+            return null;
         }
     }
-}
+};
 
  

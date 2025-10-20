@@ -11,7 +11,8 @@ module.exports = async (client, interaction, args) => {
 
     if (perms == false) return;
 
-    ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    try {
+        const data = await ticketSchema.findOne({ Guild: interaction.guild.id });
         if (data) {
             const ticketCategory = interaction.guild.channels.cache.get(data.Category);
             const ticketRole = interaction.guild.roles.cache.get(data.Role);
@@ -61,7 +62,9 @@ module.exports = async (client, interaction, args) => {
                 type: 'editreply'
             }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans raise.js:', err);
+    }
 }
 
  

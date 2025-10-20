@@ -14,7 +14,8 @@ module.exports = async (client, interaction, args) => {
 
     let note = interaction.options.getString('note');
 
-    Schema.findOne({ Guild: interaction.guild.id, Code: code }, async (err, data) => {
+    try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id, Code: code });
         if (!data) {
             new Schema({
                 Guild: interaction.guild.id,
@@ -25,7 +26,9 @@ module.exports = async (client, interaction, args) => {
 
             client.succNormal({ text: "Note has been added! \`/notepad notes\` to see all your notes", type: 'editreply' }, interaction);
         }
-    })
+    } catch (err) {
+        console.error('Erreur Mongoose dans add.js:', err);
+    }
 }
 
  

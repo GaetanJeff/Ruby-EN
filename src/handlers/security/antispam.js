@@ -11,8 +11,9 @@ module.exports = async (client) => {
     client.on(Discord.Events.MessageCreate, async (message) => {
         if (message.author.bot || message.channel.type === Discord.ChannelType.DM) return;
 
-        Schema.findOne({ Guild: message.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: message.guild.id });
+        if (data) {
                 if (data.AntiSpam == true) {
                     if (usersMap.has(message.author.id)) {
                         const userData = usersMap.get(message.author.id);
@@ -58,6 +59,8 @@ module.exports = async (client) => {
                     }
                 }
             }
-        })
+    } catch (err) {
+        console.error('Erreur Mongoose dans antispam.js:', err);
+    }
     }).setMaxListeners(0);
 }

@@ -16,8 +16,9 @@ module.exports = async (client, interaction, args) => {
             },
         ],
     }).then(async (channel) => {
-        Schema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-            if (data) {
+        try {
+        const data = await Schema.findOne({ Guild: interaction.guild.id });
+        if (data) {
                 data.Roles = channel.id;
                 data.save();
             }
@@ -27,8 +28,9 @@ module.exports = async (client, interaction, args) => {
                     Roles: channel.id
                 }).save();
             }
-        })
-
+    } catch (err) {
+        console.error('Erreur Mongoose dans roles.js:', err);
+    }
         client.succNormal({
             text: `Roles count created!`,
             fields: [
